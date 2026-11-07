@@ -1,20 +1,21 @@
 # BatteryScope 源码运行依赖（Python 3.10+，Windows 10/11 x64）
 # 安装: pip install -r requirements.txt
 #
-# WinRT 投影包按 collector.py 实际 import 的命名空间列出，
-# 其余传递依赖由 pip 自动解析。
+# WinRT 投影包按 collector.py 实际 import 的命名空间列出。
+# 官方文档中的包名为大小写混合（winrt-Windows.Devices.Bluetooth），
+# 此处按 PEP 503 归一化写成全小写，pip 解析到同一项目。
 
 # 蓝牙 / 设备枚举 / 数据流
 winrt-runtime==4.1.0
-winrt-Windows.Devices.Bluetooth==4!10.0.28000.2957
-winrt-Windows.Devices.Enumeration==4!10.0.28000.2957
-winrt-Windows.Storage.Streams==4!10.0.28000.2957
+winrt-windows.devices.bluetooth==4!10.0.28000.2957
+winrt-windows.devices.enumeration==4!10.0.28000.2957
+winrt-windows.storage.streams==4!10.0.28000.2957
 # 上述包的传递依赖（显式列出以保证离线环境可复现）
-winrt-Windows.Devices.Bluetooth.Advertisement==4!10.0.28000.2957
-winrt-Windows.Devices.Bluetooth.GenericAttributeProfile==4!10.0.28000.2957
-winrt-Windows.Devices.Radios==4!10.0.28000.2957
-winrt-Windows.Foundation==4!10.0.28000.2957
-winrt-Windows.Foundation.Collections==4!10.0.28000.2957
+winrt-windows.devices.bluetooth.advertisement==4!10.0.28000.2957
+winrt-windows.devices.bluetooth.genericattributeprofile==4!10.0.28000.2957
+winrt-windows.devices.radios==4!10.0.28000.2957
+winrt-windows.foundation==4!10.0.28000.2957
+winrt-windows.foundation.collections==4!10.0.28000.2957
 
 # HID 枚举（包名 hidapi，模块名 hid）
 hidapi==0.15.0
