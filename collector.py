@@ -66,6 +66,7 @@ _SETUPAPI.SetupDiDestroyDeviceInfoList.restype = wintypes.BOOL
 
 
 def _kind(name):
+    """设备名 -> (kind, 中文类别)：靠关键词识别，匹配不到归为通用设备。"""
     n = (name or "").lower()
     if "mouse" in n:
         return "mouse", "鼠标"
@@ -79,6 +80,7 @@ def _kind(name):
 
 
 def _buf_bytes(buf):
+    """WinRT IBuffer -> bytes（兼容不同版本 API 形态）。"""
     from winrt.windows.storage.streams import DataReader
     try:
         r = DataReader.from_buffer(buf)
@@ -91,6 +93,7 @@ def _buf_bytes(buf):
 
 
 def _mac_from_id(dev_id):
+    """从 WinRT 设备 id 末段解析 MAC 地址。"""
     tail = (dev_id or "").rsplit("-", 1)[-1]
     return tail if ":" in tail else ""
 
@@ -424,6 +427,7 @@ def scan_light():
 
 
 def scan():
+    """全量扫描：BLE GATT + 经典蓝牙台账 + USB HID + PnP 回填（启动/手动刷新用）。"""
     t0 = time.time()
     log = []
     ble = asyncio.run(_ble_battery(log))

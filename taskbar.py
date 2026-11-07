@@ -26,6 +26,7 @@ _FONTS = {}
 
 
 def _scale():
+    """系统 DPI 缩放系数（96dpi = 1.0）。"""
     try:
         return max(1.0, ctypes.windll.user32.GetDpiForSystem() / 96.0)
     except Exception:
@@ -33,6 +34,7 @@ def _scale():
 
 
 def _font(size, bold):
+    """按 (像素高, 加粗) 缓存的 Segoe UI 字体句柄。"""
     key = (size, bold)
     if key not in _FONTS:
         _FONTS[key] = gdi32.CreateFontW(
@@ -44,6 +46,7 @@ def _font(size, bold):
 
 
 def _text(hdc, s, rect, size, color, bold=True):
+    """单行居中文本绘制（透明底）。"""
     old = win32gui.SelectObject(hdc, _font(size, bold))
     win32gui.SetBkMode(hdc, win32con.TRANSPARENT)
     win32gui.SetTextColor(hdc, color)
@@ -54,6 +57,7 @@ def _text(hdc, s, rect, size, color, bold=True):
 
 
 def _taskbar():
+    """取主任务栏窗口句柄 Shell_TrayWnd。"""
     try:
         return win32gui.FindWindow("Shell_TrayWnd", None)
     except Exception:
@@ -73,6 +77,7 @@ def _sample_bg(taskbar):
 
 
 def _size():
+    """按设备数计算贴片宽度（逻辑 px）。"""
     s = _scale()
     n = max(1, len(STRIP["devices"]))
     return int((n * PER_DEV + GAP) * s), 0, s
@@ -103,6 +108,7 @@ def _place():
 
 
 def _paint(hdc, w, h):
+    """贴片绘制：任务栏底色上逐台设备画彩色药丸 + 圆环 + 白色数字。"""
     s = _scale()
     fill(hdc, 0, 0, w, h, STRIP["bg"])
     n = len(STRIP["devices"])
@@ -137,6 +143,7 @@ def _shade(color, f):
 
 
 def _strip_proc(hwnd, msg, wp, lp):
+    """贴片窗口过程：只处理绘制，其余交系统默认。"""
     if msg == win32con.WM_PAINT:
         hdc, ps = win32gui.BeginPaint(hwnd)
         try:
@@ -204,6 +211,7 @@ def refresh():
 
 
 def destroy():
+    """销毁贴片窗口（切换到卡片模式 / 退出时调用）。"""
     h = STRIP["hwnd"]
     STRIP["hwnd"] = None
     STRIP["devices"] = []

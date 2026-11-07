@@ -11,7 +11,7 @@ from ctypes import wintypes
 
 import win32con
 import win32gui
-from gdiutil import DIB_RGB_COLORS, NULL_PEN, cref, fill
+from gdiutil import NULL_PEN, cref, fill
 from gdiutil import gdi32 as _G
 from gdiutil import user32 as _U
 
@@ -72,10 +72,6 @@ _U.DestroyIcon.argtypes = [wintypes.HANDLE]
 _U.DestroyIcon.restype = wintypes.BOOL
 _G.CreateBitmap.argtypes = [ctypes.c_int] * 4 + [ctypes.c_void_p]
 _G.CreateBitmap.restype = wintypes.HANDLE
-_G.GetDIBits.argtypes = [ctypes.c_void_p, wintypes.HANDLE, wintypes.UINT,
-                         wintypes.UINT, ctypes.c_void_p,
-                         ctypes.POINTER(BITMAPINFO), wintypes.UINT]
-_G.GetDIBits.restype = ctypes.c_int
 _G.CreateDIBSection.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_uint,
                                 ctypes.POINTER(ctypes.c_void_p), ctypes.c_void_p,
                                 ctypes.c_uint]
@@ -86,12 +82,9 @@ _APP_ICON = None     # 主图标 HICON
 
 
 def set_theme(name):
+    """切换托盘图标主题（light/dark），后续生成的图标使用新配色。"""
     global _THEME
     _THEME = name if name in ("light", "dark") else "light"
-
-
-def theme():
-    return _THEME
 
 
 _NUM_SRC = 4            # 数字离屏 4x 超采样，缩回后边缘才干净
@@ -227,6 +220,7 @@ def make_app_icon(level, size=ICON_SIZE):
 
 
 def _notify(hwnd, msg, hicon=None, tip=""):
+    """Shell_NotifyIconW 薄封装：增/改/删托盘图标。"""
     n = NOTIFYICONDATAW()
     n.cbSize = ctypes.sizeof(NOTIFYICONDATAW)
     n.hWnd = int(hwnd)
@@ -264,10 +258,6 @@ def remove_app(hwnd):
     if _APP_ICON is not None:
         _U.DestroyIcon(ctypes.c_void_p(_APP_ICON))
         _APP_ICON = None
-
-
-def app_present():
-    return _APP_ICON is not None
 
 
 def notify_app(hwnd, title, text):

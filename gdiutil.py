@@ -13,7 +13,6 @@ user32 = ctypes.WinDLL("user32", use_last_error=True)
 
 NULL_BRUSH = 5
 NULL_PEN = 8
-DIB_RGB_COLORS = 0
 # GDI 弧线默认按逆时针画（视觉方向），电量环这类进度图形必须顺时针
 AD_CLOCKWISE = 2
 PS_GEOMETRIC = 0x00010000
@@ -48,12 +47,14 @@ def cref(s):
 
 
 def fill(dc, x1, y1, x2, y2, color):
+    """纯色矩形填充。"""
     br = win32gui.CreateSolidBrush(color)
     win32gui.FillRect(dc, (x1, y1, x2, y2), br)
     win32gui.DeleteObject(br)
 
 
 def frame(dc, x1, y1, x2, y2, color):
+    """纯色矩形描边。"""
     br = win32gui.CreateSolidBrush(color)
     win32gui.FrameRect(dc, (x1, y1, x2, y2), br)
     win32gui.DeleteObject(br)
@@ -71,11 +72,8 @@ def shape(hdc, fn, args, color):
 
 
 def round_fill(hdc, x1, y1, x2, y2, r, color):
+    """纯色圆角矩形填充（NULL_PEN 消除描边毛边）。"""
     shape(hdc, gdi32.RoundRect, (x1, y1, x2, y2, r, r), color)
-
-
-def ellipse_fill(hdc, x1, y1, x2, y2, color):
-    shape(hdc, gdi32.Ellipse, (x1, y1, x2, y2), color)
 
 
 # ---- 进度圆环（widget 折叠态 / 任务栏贴片共用） --------------------------

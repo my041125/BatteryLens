@@ -91,6 +91,8 @@ python tools\_gen_icons.py     :: 重新生成 assets/gen 图标素材（换图�
 - 设备图标基于 [Phosphor Icons](https://phosphoricons.com)（MIT，声明见
   `assets/LICENSE`），经 `tools/_gen_icons.py` 二次渲染。
 - 视觉语言参考小米 HyperOS 小组件。
+- 本项目由 **毛宇** 与 **ZCode AI 助手（GLM）** 共同完成——从需求、设计、
+  编码、测试到打包分发，全部环节由人与 AI 结对完成。
 
 ## 已知边界
 

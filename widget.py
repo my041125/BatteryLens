@@ -112,6 +112,7 @@ except Exception:
 # pythonw.exe 没有控制台，sys.stdout / sys.stderr 为 None。任何未捕获异常在
 # pywin32 打印 traceback 时会二次崩溃，导致进程静默退出、窗口与图标一起消失。
 def safe_streams():
+    """pythonw 下 stdout/stderr 为 None，先重定向到 devnull 防打印崩溃。"""
     for name in ("stdout", "stderr"):
         if getattr(sys, name, None) is None:
             try:
@@ -140,6 +141,7 @@ def log_error(tag, exc=None):
 
 
 def install_hooks():
+    """全局与线程级异常钩子：未捕获异常只落 error.log，进程绝不静默退出。"""
     def hook(etype, value, tb):
         log_error("unhandled exception", value)
         try:
@@ -194,6 +196,7 @@ def system_theme():
 
 
 def effective_theme():
+    """auto 主题解析为实际主题（读注册表），其余原样返回。"""
     return system_theme() if STATE["theme"] == "auto" else STATE["theme"]
 
 
@@ -251,10 +254,12 @@ _USER32.TrackMouseEvent.restype = ctypes.c_int
 
 
 def color_of(v):
+    """电量 -> 状态色：>=60 绿、20-59 橙、<20 红。"""
     return C_GOOD if v is None or v >= 60 else (C_MID if v >= 20 else C_LOW)
 
 
 def reals(data):
+    """取有真实读数的设备列表（data 为 None 时返回空表）。"""
     return [d for d in data["devices"] if d["battery"] is not None] if data else []
 
 
@@ -265,10 +270,12 @@ def display_name(d):
 
 
 def cut(s, n):
+    """超长字符串截断加省略号。"""
     return s if len(s) <= n else s[:n - 1] + "…"
 
 
 def expanded_size(data):
+    """展开态窗口尺寸 = 头部 + 行数 × 行高 + 底部说明。"""
     return 320, 52 + max(1, len(reals(data))) * 66 + 32
 
 
@@ -303,6 +310,7 @@ def set_low_priority():
 
 
 def track_leave(hwnd):
+    """登记 WM_MOUSELEAVE 跟踪（悬停展开的收起依赖它）。"""
     t = TRACKMOUSEEVENT()
     t.cbSize = ctypes.sizeof(t)
     t.dwFlags = 0x00000002
@@ -312,12 +320,14 @@ def track_leave(hwnd):
 
 
 def inside(hwnd):
+    """光标是否在卡片窗口矩形内。"""
     px, py = win32gui.GetCursorPos()
     l, t, r, b = win32gui.GetWindowRect(hwnd)
     return l <= px <= r and t <= py <= b
 
 
 def dpi_scale():
+    """系统 DPI 缩放系数（96dpi = 1.0）。"""
     try:
         return max(1.0, _USER32.GetDpiForSystem() / 96.0)
     except Exception:
@@ -325,6 +335,7 @@ def dpi_scale():
 
 
 def setup_scale(hdc):
+    """给 DC 设 MM_ISOTROPIC 逻辑坐标：绘制代码全部按 96dpi 逻辑像素书写。"""
     if S <= 1.01:
         return
     h = ctypes.c_void_p(int(hdc))
@@ -334,6 +345,7 @@ def setup_scale(hdc):
 
 
 def font(size, bold=False, name="Microsoft YaHei"):
+    """按 (字号, 加粗, 字体名) 缓存的 GDI 字体句柄。"""
     key = (size, bold, name)
     if key not in _FONTS:
         _FONTS[key] = _GDI.CreateFontW(
@@ -346,6 +358,7 @@ def font(size, bold=False, name="Microsoft YaHei"):
 
 def text(hdc, s, rect, size, color, bold=False, right=False, center=False,
          name="Microsoft YaHei"):
+    """单行文字绘制：透明底、可选对齐，返回前恢复原字体。"""
     old = win32gui.SelectObject(hdc, font(size, bold, name))
     win32gui.SetBkMode(hdc, win32con.TRANSPARENT)
     win32gui.SetTextColor(hdc, color)
@@ -433,6 +446,7 @@ def paint_collapsed(hdc, w, h, data):
 
 
 def paint_expanded(hdc, w, h, data):
+    """展开态全量列表：标题行 + 每台设备一行（图标/名称/电量字/进度条）。"""
     text(hdc, "电量透视", (22, 0, 140, 46), 15, C_TEXT, True)
     if data:
         text(hdc, "更新 " + data["scan_time"], (140, 0, w - 22, 46),
@@ -471,6 +485,7 @@ def paint_expanded(hdc, w, h, data):
 
 
 def apply_size(hwnd):
+    """按当前形态计算尺寸并定位右下角，同时更新圆角矩形窗口区域。"""
     data = STATE["data"]
     if STATE["expanded"]:
         w, h = expanded_size(data)
@@ -497,17 +512,15 @@ def apply_size(hwnd):
 def summon_card(hwnd):
     """兜底召唤：托盘左键一点，悬浮卡必现。
 
-    无视当前形态（贴片模式自动切回卡片）、无视忙碌状态（用户意图优先）、
-    无视任何藏法（最小化则先还原，再强制重定位到底部标准位置）。
+    无视当前形态（贴片模式自动切回卡片）、无视忙碌状态（用户意图优先）；
+    最小化先还原，最后强制重定位到底部标准位置。
     """
     STATE["mode"] = "widget"
     STATE["forced_show"] = True
-    apply_mode(hwnd, explicit=True)
+    apply_mode(hwnd, explicit=True)          # 切形态 + 显示（意图优先）
     if win32gui.IsIconic(hwnd):
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-    else:
-        win32gui.ShowWindow(hwnd, win32con.SW_SHOWNOACTIVATE)
-    apply_size(hwnd)
+    apply_size(hwnd)                         # 强制归位（无论此前状态）
     save_settings()
 
 
@@ -525,6 +538,7 @@ def ensure_card_visible(hwnd):
 
 
 def set_expanded(hwnd, value):
+    """切换悬停展开态；不忙碌时立即重设窗口尺寸。"""
     if STATE["expanded"] == value:
         return
     STATE["expanded"] = value
@@ -545,6 +559,7 @@ def hover_check(hwnd):
 
 
 def request_scan(force=False):
+    """后台线程发起轻量扫描（300s 节流，force 可穿透），完成后投递 WM_REFRESH。"""
     if STATE["scanning"]:
         return
     if not force and time.time() - STATE["last_scan"] < SCAN_INTERVAL:
@@ -566,6 +581,7 @@ def request_scan(force=False):
 
 
 def on_watch(hwnd):
+    """5s/10s 心跳：忙碌切换、贴片/卡片保活自愈、悬停检测、到点扫描。"""
     busy = user_busy()
     if busy != STATE["busy"]:
         STATE["busy"] = busy
@@ -635,6 +651,7 @@ def load_settings():
 
 
 def save_settings():
+    """持久化当前设置（mode/置顶/主题/主设备/别名/低电量阈值）。"""
     try:
         with open(SETTINGS, "w", encoding="utf-8") as f:
             json.dump({"mode": STATE["mode"], "topmost": STATE["topmost"],
@@ -802,6 +819,7 @@ def rotation_timer(hwnd, on):
 
 
 def rotate_step(hwnd):
+    """轮换到下一台有读数的设备并重绘。"""
     items = reals(STATE["data"])
     if len(items) < 2:
         return
@@ -858,10 +876,12 @@ def apply_mode(hwnd, explicit=False):
 
 
 def autostart_enabled():
+    """开机自启是否已开启（以启动文件夹里的快捷方式为准）。"""
     return os.path.exists(LNK)
 
 
 def toggle_autostart():
+    """开关开机自启：往启动文件夹写/删快捷方式（exe 模式指向自身）。"""
     if autostart_enabled():
         try:
             os.remove(LNK)
@@ -887,6 +907,7 @@ def toggle_autostart():
 
 
 def primary_label():
+    """主设备菜单项的文案：自动轮换或「类别 · 电量」。"""
     pid = STATE.get("primary", "auto")
     if pid == "auto":
         return "自动轮换"
@@ -897,6 +918,7 @@ def primary_label():
 
 
 def on_menu(hwnd):
+    """构建并弹出右键菜单，返回选中的命令号并分发处理。"""
     m = win32gui.CreatePopupMenu()
     win32gui.AppendMenu(m, win32con.MF_STRING, 1, "立即刷新")
 
@@ -989,6 +1011,7 @@ def on_menu(hwnd):
 
 
 def _wnd_proc(hwnd, msg, wp, lp):
+    """卡片窗口过程：绘制/悬停/定时器/托盘回调/系统广播，全部走异常包装。"""
     if msg == win32con.WM_SYSCOMMAND:
         # 「显示桌面」/ 最小化全部：无边框悬浮卡没有最小化语义，直接吞掉，
         # 否则窗口会被收进一个不存在的任务栏按钮里，看起来像凭空消失。
@@ -1098,6 +1121,7 @@ def wnd_proc(hwnd, msg, wp, lp):
 
 
 def paint_smoke(data):
+    """离屏渲染折叠态与展开态，返回 OK/失败原因（渲染回归用）。"""
     screen = win32gui.GetDC(0)
     mem = win32gui.CreateCompatibleDC(screen)
     bmp = win32gui.CreateCompatibleBitmap(screen, 600, 400)
@@ -1227,6 +1251,7 @@ def run_checks():
 
 
 def main():
+    """入口：单实例锁 → 设置 → 首次扫描 → 建窗 → 消息循环。"""
     global HWND, S
     hide_console()
     guard = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
