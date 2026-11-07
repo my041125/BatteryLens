@@ -1,0 +1,11 @@
+# 构建产物 / 运行时生成 / 个人配置
+dist/
+build/
+__pycache__/
+app.ico
+BatteryScope.spec
+*.log
+history.jsonl
+settings.json
+*.pyc
+.mimosa/

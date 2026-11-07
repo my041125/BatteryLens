@@ -1,0 +1,30 @@
+# UTF-8
+#
+# PyInstaller 版本资源：让右键属性显示产品名与版本
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 0, 0, 0),
+    prodvers=(1, 0, 0, 0),
+    mask=0x3F,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0),
+  ),
+  kids=[
+    StringFileInfo([
+      StringTable("080404B0", [
+        StringStruct("CompanyName", "BatteryScope"),
+        StringStruct("FileDescription", "电量透视 · Windows 外设电量悬浮卡片"),
+        StringStruct("FileVersion", "1.0.0"),
+        StringStruct("InternalName", "BatteryScope"),
+        StringStruct("LegalCopyright", "MIT License"),
+        StringStruct("OriginalFilename", "BatteryScope.exe"),
+        StringStruct("ProductName", "BatteryScope 电量透视"),
+        StringStruct("ProductVersion", "1.0.0"),
+      ])
+    ]),
+    VarFileInfo([VarStruct("Translation", [2052, 1200])]),
+  ]
+)

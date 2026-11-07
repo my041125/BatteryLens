@@ -1,0 +1,27 @@
+# BatteryScope 源码运行依赖（Python 3.10+，Windows 10/11 x64）
+# 安装: pip install -r requirements.txt
+#
+# WinRT 投影包按 collector.py 实际 import 的命名空间列出，
+# 其余传递依赖由 pip 自动解析。
+
+# 蓝牙 / 设备枚举 / 数据流
+winrt-runtime==4.1.0
+winrt-Windows.Devices.Bluetooth==4!10.0.28000.2957
+winrt-Windows.Devices.Enumeration==4!10.0.28000.2957
+winrt-Windows.Storage.Streams==4!10.0.28000.2957
+# 上述包的传递依赖（显式列出以保证离线环境可复现）
+winrt-Windows.Devices.Bluetooth.Advertisement==4!10.0.28000.2957
+winrt-Windows.Devices.Bluetooth.GenericAttributeProfile==4!10.0.28000.2957
+winrt-Windows.Devices.Radios==4!10.0.28000.2957
+winrt-Windows.Foundation==4!10.0.28000.2957
+winrt-Windows.Foundation.Collections==4!10.0.28000.2957
+
+# HID 枚举（包名 hidapi，模块名 hid）
+hidapi==0.15.0
+# Win32 API 绑定
+pywin32==312
+# 图标绘制 / 素材处理
+pillow==13.0.0
+
+# 打包工具（仅构建 exe 时需要，运行不需要）
+# pyinstaller==6.22.3
