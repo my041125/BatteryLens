@@ -19,7 +19,7 @@ VSVersionInfo(
         StringStruct("FileDescription", "电量透视 · Windows 外设电量悬浮卡片"),
         StringStruct("FileVersion", "1.0.0"),
         StringStruct("InternalName", "BatteryScope"),
-        StringStruct("LegalCopyright", "MIT License"),
+        StringStruct("LegalCopyright", "Copyright (c) 2026 my - MIT License"),
         StringStruct("OriginalFilename", "BatteryScope.exe"),
         StringStruct("ProductName", "BatteryScope 电量透视"),
         StringStruct("ProductVersion", "1.0.0"),
