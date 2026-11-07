@@ -72,6 +72,7 @@ BatteryScope/
 ├── requirements.txt         ← 依赖清单
 ├── settings.example.json    ← 设置模板（运行时自动生成真实 settings.json）
 ├── assets/                  ← 图标 SVG 素材与预渲染 PNG
+├── tests/                   ← 单元/回归测试（run_all.py 统一入口）
 ├── tools/                   ← build_exe.py 打包 / _gen_icons.py 素材生成 / ui_preview.png
 └── dist/                    ← 产物：BatteryScope.exe 与分发包 zip（不入库）
 ```
@@ -81,6 +82,7 @@ BatteryScope/
 ```bat
 python tools\build_exe.py      :: 打包 dist\BatteryScope.exe
 python widget.py --check       :: 自检（功耗/采集/渲染/置顶/崩溃兜底）
+python tests\run_all.py        :: 单元/回归测试（合成数据打桩，无窗口）
 python tools\_gen_icons.py     :: 重新生成 assets/gen 图标素材（换图标时才需要）
 ```
 

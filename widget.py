@@ -11,6 +11,7 @@
 import ctypes
 import json
 import os
+from pathlib import Path
 import queue
 import socket
 import subprocess
@@ -43,6 +44,7 @@ STARTUP = os.path.join(os.environ.get("APPDATA", ""), "Microsoft", "Windows",
 LNK = os.path.join(STARTUP, "电量透视.lnk")
 SETTINGS = os.path.join(ROOT, "settings.json")
 LOG = os.path.join(ROOT, "error.log")
+LOG_MAX = 256 * 1024              # error.log 上限；超过则只保留末尾 64KB
 NO_WINDOW = 0x08000000
 # 消息编号：WM_APP+1 扫描完成；WM_APP+2 被 tray_win.Shell_NotifyIconW 占用；
 # WM_APP+3 把托盘右键异步转发成菜单，避免阻塞 explorer 的同步回调。
@@ -119,8 +121,15 @@ def safe_streams():
 
 
 def log_error(tag, exc=None):
-    """异常落盘到同目录 error.log，绝不依赖 stdout/stderr。"""
+    """异常落盘到同目录 error.log，绝不依赖 stdout/stderr；超限自动裁剪。"""
     try:
+        if os.path.exists(LOG) and os.path.getsize(LOG) > LOG_MAX:
+            with open(LOG, "r", encoding="utf-8", errors="replace") as f:
+                tail = f.read()[-64 * 1024:]        # 只保留末尾 64KB
+            # 超限重写走 pathlib（追加仍走 open(..., "a")）
+            Path(LOG).write_text(
+                "[%s] == error.log 超过 256KB，以下为保留的末尾 64KB ==\n%s"
+                % (time.strftime("%Y-%m-%d %H:%M:%S"), tail), encoding="utf-8")
         with open(LOG, "a", encoding="utf-8") as f:
             f.write("[%s] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), tag))
             if exc is not None:
