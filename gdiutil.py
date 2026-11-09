@@ -1,4 +1,4 @@
-"""BatteryScope 共用 GDI 薄封装：widget.py / tray_win.py 的公共底层。
+"""BatteryLens 共用 GDI 薄封装：widget.py / tray_win.py 的公共底层。
 
 只放真正共享的部分：COLORREF 颜色转换、常用 gdi32/user32 绑定、
 纯色图元填充。调用方用 `from gdiutil import gdi32 as _GDI` 复用同一

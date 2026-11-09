@@ -1,4 +1,4 @@
-"""电量透视 BatteryScope · 桌面悬浮卡片 / 任务栏贴片（小米风，原生 Win32）
+"""电量透视 BatteryLens · 桌面悬浮卡片 / 任务栏贴片（小米风，原生 Win32）
 
 两种显示形态可在右键菜单里随时切换，选择会记住：
   · 桌面卡片（默认）：右下角胶囊卡（图标 + 名称/续航 + 电量字 + 进度条），
@@ -1193,10 +1193,10 @@ def run_checks():
     wc = win32gui.WNDCLASS()
     wc.lpfnWndProc = win32gui.DefWindowProc
     wc.hInstance = win32api.GetModuleHandle(None)
-    wc.lpszClassName = "BatteryScopeCheckProbe"
+    wc.lpszClassName = "BatteryLensCheckProbe"
     win32gui.RegisterClass(wc)
     hwnd = win32gui.CreateWindowEx(
-        0, "BatteryScopeCheckProbe", "probe", win32con.WS_POPUP,
+        0, "BatteryLensCheckProbe", "probe", win32con.WS_POPUP,
         0, 0, 1, 1, 0, 0, wc.hInstance, None)
     try:
         apply_topmost(hwnd, True)
@@ -1210,7 +1210,7 @@ def run_checks():
     finally:
         try:
             win32gui.DestroyWindow(hwnd)
-            win32gui.UnregisterClass("BatteryScopeCheckProbe", wc.hInstance)
+            win32gui.UnregisterClass("BatteryLensCheckProbe", wc.hInstance)
         except Exception:
             pass
 
@@ -1277,14 +1277,14 @@ def main():
     wc = win32gui.WNDCLASS()
     wc.lpfnWndProc = wnd_proc
     wc.hInstance = win32api.GetModuleHandle(None)
-    wc.lpszClassName = "BatteryScopeWidget"
+    wc.lpszClassName = "BatteryLensWidget"
     wc.hCursor = win32gui.LoadCursor(0, win32con.IDC_ARROW)
     atom = win32gui.RegisterClass(wc)
     # 不带 WS_VISIBLE：先定位到右下角再由 apply_mode 决定显示，
     # 避免启动瞬间在左上角 (0,0) 闪现一个 80px 的小方块。
     hwnd = win32gui.CreateWindowEx(
         win32con.WS_EX_TOOLWINDOW | win32con.WS_EX_NOACTIVATE,
-        atom, "BatteryScope", win32con.WS_POPUP,
+        atom, "BatteryLens", win32con.WS_POPUP,
         0, 0, PILL_W, PILL_H, 0, 0, wc.hInstance, None)
     HWND = hwnd
     apply_size(hwnd)

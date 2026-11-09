@@ -1,4 +1,4 @@
-"""BatteryScope · 任务栏贴片：SetParent 嵌入 Shell_TrayWnd。
+"""BatteryLens · 任务栏贴片：SetParent 嵌入 Shell_TrayWnd。
 
 参考 TrafficMonitor 的嵌入思路：把自绘窗口挂成任务栏子窗口，贴在
 TrayNotifyWnd（通知区）左侧，逐设备画迷你电量环 + 百分比。
@@ -13,7 +13,7 @@ import win32gui
 
 from gdiutil import cref, fill, gdi32, ring_arc, ring_track, round_fill
 
-STRIP_CLASS = "BatteryScopeStrip"
+STRIP_CLASS = "BatteryLensStrip"
 PER_DEV = 46          # 每台设备占宽（逻辑 px）
 GAP = 8               # 与通知区的间距（逻辑 px）
 # 设备彩色圆环衬底（与卡片 KIND_BG 一致）
@@ -179,7 +179,7 @@ def ensure(owner):
     s = _scale()
     hwnd = win32gui.CreateWindowEx(
         win32con.WS_EX_NOACTIVATE | win32con.WS_EX_TOOLWINDOW,
-        STRIP_CLASS, "BatteryScopeStrip", win32con.WS_POPUP,
+        STRIP_CLASS, "BatteryLensStrip", win32con.WS_POPUP,
         0, 0, int(PER_DEV * s), int(40 * s), 0, 0, hinst, None)
     if not hwnd:
         return False

@@ -1,4 +1,4 @@
-# BatteryScope 源码运行依赖（Python 3.10+，Windows 10/11 x64）
+# BatteryLens 源码运行依赖（Python 3.10+，Windows 10/11 x64）
 # 安装: pip install -r requirements.txt
 #
 # WinRT 投影包按 collector.py 实际 import 的命名空间列出。

@@ -1,4 +1,4 @@
-# 电量透视 BatteryScope
+# 电量透视 BatteryLens
 
 Windows 桌面小工具：读取蓝牙 / USB 外设的**真实电量**，以「桌面胶囊卡片 +
 任务栏贴片」展示。原生 Win32 实现，单进程、单文件绿色 exe、零联网。
@@ -11,8 +11,8 @@ Windows 桌面小工具：读取蓝牙 / USB 外设的**真实电量**，以「�
 
 ## 下载
 
-- **免安装**：从 [Releases](../../releases/latest) 下载 `BatteryScope-1.0-win64.zip`，
-  解压双击 `BatteryScope.exe` 即用（单文件、无需 Python、不写注册表）。
+- **免安装**：从 [Releases](../../releases/latest) 下载 `BatteryLens-1.0-win64.zip`，
+  解压双击 `BatteryLens.exe` 即用（单文件、无需 Python、不写注册表）。
 - **源码运行**：`pip install -r requirements.txt` 后双击 `start.bat`
   （或 `python widget.py`）。需要 Python 3.10+ / Windows 10-11 x64。
 
@@ -68,7 +68,7 @@ Windows 桌面小工具：读取蓝牙 / USB 外设的**真实电量**，以「�
 ## 项目结构
 
 ```
-BatteryScope/
+BatteryLens/
 ├── widget.py 等 5 个模块    ← 运行时源码（互相 import 的一个整体，保持同层）
 ├── start.bat                ← 源码运行入口（双击）
 ├── requirements.txt         ← 依赖清单
@@ -76,13 +76,13 @@ BatteryScope/
 ├── assets/                  ← 图标 SVG 素材与预渲染 PNG
 ├── tests/                   ← 单元/回归测试（run_all.py 统一入口）
 ├── tools/                   ← build_exe.py 打包 / _gen_icons.py 素材生成 / ui_preview.png
-└── dist/                    ← 产物：BatteryScope.exe 与分发包 zip（不入库）
+└── dist/                    ← 产物：BatteryLens.exe 与分发包 zip（不入库）
 ```
 
 ## 构建与自检
 
 ```bat
-python tools\build_exe.py      :: 打包 dist\BatteryScope.exe
+python tools\build_exe.py      :: 打包 dist\BatteryLens.exe
 python widget.py --check       :: 自检（功耗/采集/渲染/置顶/崩溃兜底）
 python tests\run_all.py        :: 单元/回归测试（合成数据打桩，无窗口）
 python tools\_gen_icons.py     :: 重新生成 assets/gen 图标素材（换图标时才需要）

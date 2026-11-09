@@ -1,6 +1,6 @@
 """一键打包：python tools\\build_exe.py
 
-产出 dist/BatteryScope.exe（单文件、无控制台）。双击即用，无需 Python 环境。
+产出 dist/BatteryLens.exe（单文件、无控制台）。双击即用，无需 Python 环境。
 运行时源码在项目根（widget.py 等 5 个模块），素材在 assets/，产物在 dist/。
 """
 import os
@@ -25,12 +25,12 @@ def make_icon():
 
 def main():
     ico = make_icon()
-    print("building BatteryScope.exe ...")
+    print("building BatteryLens.exe ...")
     # 参数全部为脚本内常量，无外部输入参与
     subprocess.run(
         [sys.executable, "-m", "PyInstaller",
          "--onefile", "--noconsole",
-         "--name", "BatteryScope",
+         "--name", "BatteryLens",
          "--icon", ico,
          "--version-file", os.path.join(TOOLS, "version.txt"),
          "--add-data", os.path.join(PROJECT, "assets") + ";assets",
@@ -39,7 +39,7 @@ def main():
          "--specpath", os.path.join(PROJECT, "build"),
          os.path.join(PROJECT, "widget.py")],
         cwd=PROJECT, check=True, shell=False)
-    out = os.path.join(PROJECT, "dist", "BatteryScope.exe")
+    out = os.path.join(PROJECT, "dist", "BatteryLens.exe")
     print("OK ->", out, os.path.getsize(out) // 1024, "KB")
 
 

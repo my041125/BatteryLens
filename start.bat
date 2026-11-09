@@ -4,7 +4,7 @@ rem non-ASCII comments can decode into quote/paren bytes that shred blocks.
 rem Delayed expansion is required: %VAR% inside a ( ... ) block expands at
 rem parse time (to empty here), which broke the dependency check below.
 setlocal EnableDelayedExpansion
-title BatteryScope
+title BatteryLens
 cd /d "%~dp0"
 
 rem ===== 1. Prefer a Python with full deps (winrt / hidapi / pywin32) =====
@@ -40,7 +40,7 @@ if not defined PY (
 )
 
 rem Prefer pythonw.exe: no console window, no focus steal on start.
-echo BatteryScope starting. Check the small card at the bottom-right of the desktop.
+echo BatteryLens starting. Check the small card at the bottom-right of the desktop.
 if defined PW (
   start "" "!PW!" widget.py
 ) else (
