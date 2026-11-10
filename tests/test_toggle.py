@@ -63,13 +63,14 @@ check("忙碌时非主动切换 → 卡片隐藏", not win32gui.IsWindowVisible(
 widget.apply_mode(hwnd, explicit=True)       # 忙碌 + 菜单主动 → 显示
 check("忙碌时菜单主动切换 → 卡片立即显示", win32gui.IsWindowVisible(hwnd))
 check("forced_show 已置位", widget.STATE["forced_show"])
-# 忙碌解除：预设「上一轮是忙碌」，on_watch 实测不忙 → 触发过渡分支
+# 忙碌解除：打桩「实测不忙」+ 预设「上一轮是忙碌」→ 触发过渡分支
+orig_busy = widget.user_busy
+widget.user_busy = lambda: False
 widget.STATE["busy"] = True
 widget.on_watch(hwnd)
 check("忙碌解除 → 保持显示且清除标记", win32gui.IsWindowVisible(hwnd)
       and not widget.STATE["forced_show"])
 # 再次进入全屏：打桩 user_busy 返回 True
-orig_busy = widget.user_busy
 widget.STATE["busy"] = False
 widget.user_busy = lambda: True
 widget.on_watch(hwnd)

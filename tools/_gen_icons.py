@@ -43,8 +43,8 @@ def rgba(hex_color, alpha=255):
 
 def svg_mask(svg_path, px=768):
     """SVG -> 灰度蒙版（白=图标，黑=背景），用于抗锯齿合成。"""
-    with open(svg_path, "r", encoding="utf-8") as f:
-        txt = f.read().replace("currentColor", "#000000")
+    txt = Path(svg_path).read_text(encoding="utf-8")
+    txt = txt.replace("currentColor", "#000000")
     TMP_SVG.write_text(txt, encoding="utf-8")
     dr = svg2rlg(str(TMP_SVG))
     TMP_SVG.unlink(missing_ok=True)

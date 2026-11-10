@@ -116,7 +116,7 @@ def safe_streams():
     for name in ("stdout", "stderr"):
         if getattr(sys, name, None) is None:
             try:
-                setattr(sys, name, open(os.devnull, "w"))
+                setattr(sys, name, Path(os.devnull).open("w"))
             except Exception:
                 pass
 
@@ -125,13 +125,13 @@ def log_error(tag, exc=None):
     """异常落盘到同目录 error.log，绝不依赖 stdout/stderr；超限自动裁剪。"""
     try:
         if os.path.exists(LOG) and os.path.getsize(LOG) > LOG_MAX:
-            with open(LOG, "r", encoding="utf-8", errors="replace") as f:
-                tail = f.read()[-64 * 1024:]        # 只保留末尾 64KB
-            # 超限重写走 pathlib（追加仍走 open(..., "a")）
+            tail = Path(LOG).read_text(
+                encoding="utf-8", errors="replace")[-64 * 1024:]
+            # 超限重写走 pathlib，保留末尾 64KB
             Path(LOG).write_text(
                 "[%s] == error.log 超过 256KB，以下为保留的末尾 64KB ==\n%s"
                 % (time.strftime("%Y-%m-%d %H:%M:%S"), tail), encoding="utf-8")
-        with open(LOG, "a", encoding="utf-8") as f:
+        with Path(LOG).open("a", encoding="utf-8") as f:
             f.write("[%s] %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), tag))
             if exc is not None:
                 traceback.print_exception(type(exc), exc, exc.__traceback__, file=f)
@@ -653,12 +653,12 @@ def load_settings():
 def save_settings():
     """持久化当前设置（mode/置顶/主题/主设备/别名/低电量阈值）。"""
     try:
-        with open(SETTINGS, "w", encoding="utf-8") as f:
-            json.dump({"mode": STATE["mode"], "topmost": STATE["topmost"],
-                       "theme": STATE["theme"], "primary": STATE["primary"],
-                       "aliases": STATE.get("aliases", {}),
-                       "low_at": STATE.get("low_at", 20)},
-                      f, ensure_ascii=False)
+        Path(SETTINGS).write_text(json.dumps(
+            {"mode": STATE["mode"], "topmost": STATE["topmost"],
+             "theme": STATE["theme"], "primary": STATE["primary"],
+             "aliases": STATE.get("aliases", {}),
+             "low_at": STATE.get("low_at", 20)}, ensure_ascii=False),
+            encoding="utf-8")
     except Exception:
         pass
 
